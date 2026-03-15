@@ -3,11 +3,35 @@ const BACKEND_URL = window.location.hostname === "localhost" || window.location.
   ? "" 
   : "https://peermeet-webrtc-0a4b.onrender.com";
 
+console.log("Attempting to connect to backend at:", BACKEND_URL || "Localhost");
+
 const socket = io(BACKEND_URL, {
   transports: ["websocket", "polling"],
   reconnection: true,
-  reconnectionAttempts: 5,
-  reconnectionDelay: 1000,
+  reconnectionAttempts: 10,
+  reconnectionDelay: 2000,
+});
+
+// Sync Status UI
+const statusIcon = document.getElementById("status-icon");
+const statusText = document.getElementById("status-text");
+
+socket.on("connect", () => {
+  console.log("✅ Socket Connected! ID:", socket.id);
+  if (statusIcon) statusIcon.style.color = "lime";
+  if (statusText) statusText.textContent = "Connected";
+});
+
+socket.on("connect_error", (error) => {
+  console.error("❌ Socket Connection Error:", error);
+  if (statusIcon) statusIcon.style.color = "red";
+  if (statusText) statusText.textContent = "Error Connecting";
+});
+
+socket.on("disconnect", (reason) => {
+  console.warn("⚠️ Socket Disconnected:", reason);
+  if (statusIcon) statusIcon.style.color = "orange";
+  if (statusText) statusText.textContent = "Disconnected";
 });
 
 let roomId;
@@ -175,6 +199,7 @@ async function joinRoom() {
     document.getElementById("join-section").style.display = "none";
 
     resetUnread();
+    console.log(`Joining Room: ${roomId} as ${username}`);
     socket.emit("join-room", roomId, username);
   } catch (error) {
     console.error(error);
@@ -408,6 +433,7 @@ function updateParticipantsList() {
 
 /* Socket handlers */
 socket.on("user-connected", async (userId, userName) => {
+  console.log(`Signal: User connected - ${userName} (${userId})`);
   peerUsernames[userId] = userName;
   updateParticipantsList();
 

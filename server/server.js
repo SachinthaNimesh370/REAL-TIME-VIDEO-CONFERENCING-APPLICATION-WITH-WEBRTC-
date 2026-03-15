@@ -25,7 +25,10 @@ io.on("connection", (socket) => {
   socket.on("join-room", (roomId, username) => {
     currentRoom = roomId;
 
-    if (!rooms[roomId]) rooms[roomId] = [];
+    if (!rooms[roomId]) {
+      console.log(`Creating NEW room: ${roomId}`);
+      rooms[roomId] = [];
+    }
     if (!roomsReactions[roomId]) roomsReactions[roomId] = {};
 
     socket.join(roomId);
@@ -35,6 +38,7 @@ io.on("connection", (socket) => {
       username: username || "Guest",
     });
 
+    console.log(`User ${username} (${socket.id}) joined room ${roomId}. Total users: ${rooms[roomId].length}`);
     socket.to(roomId).emit("user-connected", socket.id, username);
 
     socket.emit(
