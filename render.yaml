@@ -2,6 +2,7 @@ services:
   - type: web
     name: peermeet-webrtc-0a4b
     env: node
+    plan: free
     buildCommand: npm install
     startCommand: npm start
     envVars:
