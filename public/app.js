@@ -10,10 +10,11 @@ const socket = io(BACKEND_URL, {
   reconnectionDelay: 1000,
 });
 
-let localStream;
-let peerConnections = {};
 let roomId;
 let username;
+
+let localStream;
+let peerConnections = {};
 let isHost = false;
 let peerUsernames = {};
 let screenStream = null;
