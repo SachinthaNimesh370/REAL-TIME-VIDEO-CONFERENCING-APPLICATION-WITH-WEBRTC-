@@ -1,16 +1,33 @@
-// Replace with your actual Render URL after deployment
-const BACKEND_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
-  ? "" 
-  : "https://peermeet-webrtc-0a4b.onrender.com";
+// 1. Get Backend URL (Allow override via LocalStorage for debugging)
+let BACKEND_URL = localStorage.getItem("PEERMEET_BACKEND_URL") || 
+  (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+    ? "" 
+    : "https://peermeet-webrtc-0a4b.onrender.com");
 
-console.log("Attempting to connect to backend at:", BACKEND_URL || "Localhost");
+console.log("🚀 Current Backend URL:", BACKEND_URL || "Localhost");
+
+// 2. Health Check (Test if the server is even awake)
+if (BACKEND_URL) {
+  fetch(`${BACKEND_URL}/health`)
+    .then(r => r.json())
+    .then(data => console.log("✅ Server Health Check:", data))
+    .catch(err => console.error("❌ Server Health Check Failed (Server might be down or URL wrong):", err));
+}
 
 const socket = io(BACKEND_URL, {
   transports: ["websocket", "polling"],
   reconnection: true,
-  reconnectionAttempts: 10,
-  reconnectionDelay: 2000,
+  reconnectionAttempts: 15,
+  reconnectionDelay: 1000,
 });
+
+// Helper for user to change URL in console: 
+// setBackend("https://your-new-url.onrender.com")
+window.setBackend = (newUrl) => {
+  localStorage.setItem("PEERMEET_BACKEND_URL", newUrl);
+  console.log("URL Updated! Reloading...");
+  location.reload();
+};
 
 // Sync Status UI
 const statusIcon = document.getElementById("status-icon");

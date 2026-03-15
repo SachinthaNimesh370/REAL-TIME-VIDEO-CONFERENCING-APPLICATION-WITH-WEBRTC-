@@ -14,6 +14,11 @@ const io = new Server(server, {
 
 app.use(express.static("public"));
 
+// Health check endpoint
+app.get("/health", (req, res) => {
+  res.json({ status: "ok", time: new Date().toISOString() });
+});
+
 const rooms = {};
 // ✅ store reactions per room: roomsReactions[roomId][messageId] = { "👍": 2, "❤️": 1 ... }
 const roomsReactions = {};
