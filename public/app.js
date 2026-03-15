@@ -1,4 +1,9 @@
-const socket = io({
+// Replace with your actual Render URL after deployment
+const BACKEND_URL = window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1"
+  ? "" 
+  : "https://peermeet-webrtc-0a4b.onrender.com";
+
+const socket = io(BACKEND_URL, {
   transports: ["websocket", "polling"],
   reconnection: true,
   reconnectionAttempts: 5,
